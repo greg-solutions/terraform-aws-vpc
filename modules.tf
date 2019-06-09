@@ -11,7 +11,7 @@ resource "aws_vpc" "private_vpc" {
   enable_dns_hostnames = true
   tags {
     Env = "${var.vpc_env}"
-    Name = "${lower(format("%s",var.vpc_env))}"
+    Name = "${lower(format("%s-%s",var.app_name,var.vpc_env))}"
   }
 }
 /*
