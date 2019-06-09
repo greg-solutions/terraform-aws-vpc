@@ -100,7 +100,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 
 resource "aws_flow_log" "vpc_traffic_flow_logs" {
 
-  log_destination = ""
+  log_destination = "${aws_cloudwatch_log_group.vpc_log_group.arn}"
   iam_role_arn = "${aws_iam_role.vpc_log_role.arn}"
   vpc_id = "${aws_vpc.private_vpc.id}"
   traffic_type = "ALL"
