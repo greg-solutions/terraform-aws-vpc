@@ -1,16 +1,16 @@
-variable "vpc_env" {
+variable "vpc_name" {
   description = "Name of VPC to make provisioning for. Almost all resources, created within VPC will be tagged with this value"
   type = "string"
 }
 
-variable "vpc_name_alias" {
-  type = "string"
+variable "vpc_cidr" {
+  default = ""
 }
 
-variable "image_tag" {
+variable "env_name" {
+  default = ""
 }
 
-variable "app_env_list" {
-  type = "list"
-  default = ["node"]
+variable "aws_availability_zones" {
+  default = ""
 }
