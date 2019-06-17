@@ -1,11 +1,11 @@
 resource "aws_ecr_repository" "container_repository" {
-  count = "${length(var.app_env_list)}"
-  name  = "${lower(var.image_tag)}-${lower(element(var.app_env_list,count.index))}"
+
+  name = "${lower(element(var.vpc_env,count.index))}-${lower(var.image_tag)}"
 }
 
 resource "aws_ecr_lifecycle_policy" "container_repository_lifecycle_policy" {
-  count      = "${length(var.app_env_list)}"
-  repository = "${element(aws_ecr_repository.container_repository.*.name,count.index)}"
+
+  repository = "${aws_ecr_repository.container_repository.name}"
 
   policy = <<EOF
 {
@@ -29,8 +29,8 @@ EOF
 }
 
 resource "aws_ecr_repository_policy" "container_repository_policy" {
-  count      = "${length(var.app_env_list)}"
-  repository = "${element(aws_ecr_repository.container_repository.*.name,count.index)}"
+
+  repository = "${aws_ecr_repository.container_repository.name}"
 
   policy = <<EOF
 {

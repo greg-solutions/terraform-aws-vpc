@@ -9,8 +9,3 @@ variable "vpc_name_alias" {
 
 variable "image_tag" {
 }
-
-variable "app_env_list" {
-  type = "list"
-  default = ["node"]
-}
