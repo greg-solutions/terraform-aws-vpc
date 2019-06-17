@@ -12,5 +12,5 @@ variable "env_name" {
 }
 
 variable "aws_availability_zones" {
-  default = ""
+  type = "list"
 }
