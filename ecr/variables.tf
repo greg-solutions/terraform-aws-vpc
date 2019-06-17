@@ -3,9 +3,5 @@ variable "vpc_env" {
   type = "string"
 }
 
-variable "vpc_name_alias" {
-  type = "string"
-}
-
 variable "image_tag" {
 }
