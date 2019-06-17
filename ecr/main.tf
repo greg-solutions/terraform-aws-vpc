@@ -1,12 +1,9 @@
 resource "aws_ecr_repository" "container_repository" {
-
-  name = "${lower(element(var.vpc_env,count.index))}-${lower(var.image_tag)}"
+  name = "${lower(var.vpc_env)}-${lower(var.image_tag)}"
 }
 
 resource "aws_ecr_lifecycle_policy" "container_repository_lifecycle_policy" {
-
   repository = "${aws_ecr_repository.container_repository.name}"
-
   policy = <<EOF
 {
     "rules": [
@@ -29,9 +26,7 @@ EOF
 }
 
 resource "aws_ecr_repository_policy" "container_repository_policy" {
-
   repository = "${aws_ecr_repository.container_repository.name}"
-
   policy = <<EOF
 {
     "Version": "2008-10-17",
