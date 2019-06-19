@@ -74,10 +74,13 @@ resource "aws_subnet" "private_subnet" {
 resource "aws_eip" "vpc_elastic_public_ip" {
   vpc = true
   count = "${length(var.aws_availability_zones)}"
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${lower(format("%s-elastic-ip-zone-%d", aws_vpc.private_vpc.tags.Name,count.index))}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+    },
+    {
+      Name = "${lower(format("%s-elastic-ip-zone-%d", aws_vpc.private_vpc.tags.Name,count.index))}"
+    }]
 }
 
 /*
