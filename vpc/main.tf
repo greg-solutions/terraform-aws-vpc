@@ -14,7 +14,7 @@ resource "aws_vpc" "private_vpc" {
   instance_tenancy = "default"
   enable_dns_support = true
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${lower(format("%s-%s",var.app_name,var.vpc_env))}"
   }
@@ -29,7 +29,7 @@ resource "aws_vpc" "private_vpc" {
 */
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = "${aws_vpc.private_vpc.id}"
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${lower(format("%s-internet-gateway", local.vpc_name))}"
   }
@@ -47,7 +47,7 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = "${element(var.aws_availability_zones, count.index)}"
   map_public_ip_on_launch = true
 
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${format("%s-public-subnet-zone-%d", local.vpc_name, count.index)}"
   }
@@ -65,7 +65,7 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = "${element(var.aws_availability_zones, count.index)}"
   map_public_ip_on_launch = false
 
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${lower(format("%s-private-subnet-zone-%d", local.vpc_name, count.index))}"
   }
@@ -79,7 +79,7 @@ resource "aws_subnet" "private_subnet" {
 resource "aws_eip" "vpc_elastic_public_ip" {
   vpc = true
   count = "${length(var.aws_availability_zones)}"
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${lower(format("%s-elastic-ip-zone-%d", local.vpc_name,count.index))}"
   }
@@ -97,7 +97,7 @@ resource "aws_nat_gateway" "nat_gateway" {
   subnet_id = "${element(aws_subnet.public_subnet.*.id, count.index)}"
   depends_on = [
     "aws_internet_gateway.internet_gateway"]
-  tags {
+  tags = {
     Env = "${var.vpc_env}"
     Name = "${lower(format("%s-nat-gw-zone-%d", local.vpc_name, count.index))}"
   }
