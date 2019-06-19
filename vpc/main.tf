@@ -4,15 +4,20 @@
   the rest of AWS cloud. VPC can be fine-tudned, it is possible tp select its IP address range, create subnets,
   and configure route tables, network gateways, security settings, etc.
 */
+
+locals {
+  vpc_name = "${lower(format("%s-%s",var.app_name,var.vpc_env))}"
+}
 resource "aws_vpc" "private_vpc" {
   cidr_block = "${var.vpc_cidr}"
   instance_tenancy = "default"
   enable_dns_support = true
   enable_dns_hostnames = true
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${lower(format("%s-%s",var.app_name,var.vpc_env))}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+      Name = "${local.vpc_name}"
+    }]
 }
 /*
   An Internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows communication
@@ -24,10 +29,11 @@ resource "aws_vpc" "private_vpc" {
 */
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = "${aws_vpc.private_vpc.id}"
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${lower(format("%s-internet-gateway", aws_vpc.private_vpc.tags.Name))}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+      Name = "${lower(format("%s-internet-gateway", local.vpc_name))}"
+    }]
 }
 
 /*
@@ -42,10 +48,11 @@ resource "aws_subnet" "public_subnet" {
   availability_zone = "${element(var.aws_availability_zones, count.index)}"
   map_public_ip_on_launch = true
 
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${format("%s-public-subnet-zone-%d", aws_vpc.private_vpc.tags.Name, count.index)}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+      Name = "${format("%s-public-subnet-zone-%d",local.vpc_name, count.index)}"
+    }]
 }
 
 /*
@@ -60,10 +67,11 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = "${element(var.aws_availability_zones, count.index)}"
   map_public_ip_on_launch = false
 
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${lower(format("%s-private-subnet-zone-%d", aws_vpc.private_vpc.tags.Name, count.index))}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+      Name = "${lower(format("%s-private-subnet-zone-%d", local.vpc_name, count.index))}"
+    }]
 }
 
 /*
@@ -76,10 +84,8 @@ resource "aws_eip" "vpc_elastic_public_ip" {
   count = "${length(var.aws_availability_zones)}"
   tags = [
     {
-      Env = "${var.vpc_env}"
-    },
-    {
-      Name = "${lower(format("%s-elastic-ip-zone-%d", aws_vpc.private_vpc.tags.Name,count.index))}"
+      Env = "${var.vpc_env}",
+      Name = "${lower(format("%s-elastic-ip-zone-%d",local.vpc_name,count.index))}"
     }]
 }
 
@@ -95,10 +101,11 @@ resource "aws_nat_gateway" "nat_gateway" {
   subnet_id = "${element(aws_subnet.public_subnet.*.id, count.index)}"
   depends_on = [
     "aws_internet_gateway.internet_gateway"]
-  tags {
-    Env = "${var.vpc_env}"
-    Name = "${lower(format("%s-nat-gw-zone-%d", aws_vpc.private_vpc.tags.Name, count.index))}"
-  }
+  tags = [
+    {
+      Env = "${var.vpc_env}"
+      Name = "${lower(format("%s-nat-gw-zone-%d", local.vpc_name, count.index))}"
+    }]
 }
 
 resource "aws_flow_log" "vpc_traffic_flow_logs" {
